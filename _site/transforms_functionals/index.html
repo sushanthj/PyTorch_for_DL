@@ -135,8 +135,292 @@
   <summary class="text-delta">
     Table of contents
   </summary>
+<ol id="markdown-toc">
+  <li><a href="#basic-operations-without-transforms" id="markdown-toc-basic-operations-without-transforms">Basic operations without transforms</a>    <ol>
+      <li><a href="#changing-image-channels-aka-flipping-elements-in-any-specified-dimension" id="markdown-toc-changing-image-channels-aka-flipping-elements-in-any-specified-dimension">Changing Image Channels (aka flipping elements in any specified dimension)</a></li>
+    </ol>
+  </li>
+  <li><a href="#tensor-operations-using-torchvisiontransform" id="markdown-toc-tensor-operations-using-torchvisiontransform">Tensor operations using torchvision.transform</a>    <ol>
+      <li><a href="#padding" id="markdown-toc-padding">Padding</a>        <ol>
+          <li><a href="#padding-using-a-mask-tensor" id="markdown-toc-padding-using-a-mask-tensor">Padding using a mask tensor</a>            <ol>
+              <li><a href="#create-a-zero-mask" id="markdown-toc-create-a-zero-mask">Create a zero mask</a></li>
+              <li><a href="#copy-the-original-image-onto-the-mask" id="markdown-toc-copy-the-original-image-onto-the-mask">Copy the original image onto the mask</a></li>
+            </ol>
+          </li>
+          <li><a href="#padding-using-a-torch-transform" id="markdown-toc-padding-using-a-torch-transform">Padding using a torch transform</a></li>
+        </ol>
+      </li>
+      <li><a href="#resizing" id="markdown-toc-resizing">Resizing</a></li>
+    </ol>
+  </li>
+  <li><a href="#torch-functionals" id="markdown-toc-torch-functionals">Torch Functionals</a>    <ol>
+      <li><a href="#using-torchvisiontransformations-inside-functionals" id="markdown-toc-using-torchvisiontransformations-inside-functionals">Using torchvision.transformations inside functionals</a></li>
+      <li><a href="#creating-meta-models" id="markdown-toc-creating-meta-models">Creating Meta Models</a></li>
+    </ol>
+  </li>
+</ol>
 
 </details>
+
+<p>All transforms come under the module <strong>torchvision.transforms</strong> and can be used within the layer of a neural net</p>
+
+<p>we usually import this as:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">torchvision.transforms</span> <span class="k">as</span> <span class="n">T</span>
+</code></pre></div></div>
+      <h1 id="basic-operations-without-transforms">
+        
+        
+          <a href="#basic-operations-without-transforms" class="anchor-heading" aria-labelledby="basic-operations-without-transforms"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Basic operations without transforms
+        
+        
+      </h1>
+    
+      <h2 id="changing-image-channels-aka-flipping-elements-in-any-specified-dimension">
+        
+        
+          <a href="#changing-image-channels-aka-flipping-elements-in-any-specified-dimension" class="anchor-heading" aria-labelledby="changing-image-channels-aka-flipping-elements-in-any-specified-dimension"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Changing Image Channels (aka flipping elements in any specified dimension)
+        
+        
+      </h2>
+    
+
+<p>The way an image is loaded varies with implementations:</p>
+<ul>
+  <li>pytorch: CHW (channels, width, height)</li>
+  <li>opencv: HWC (height, width, channels)</li>
+  <li>numpy: WHC (width, height, channels) <em>this is also what imagej shows</em></li>
+</ul>
+
+<p>FYI, <strong>loading an image in opencv loads it as BGR channels</strong> <br />
+To correct this we usually do cv2.cvt_Color(image, cv2.BGR2RGB)</p>
+
+<p>However, if we need to do the same in numpy or on torch, we essentially just need to flip the dimensions of channels B and R (or we just say flip dimension no. 0 of image tensor)</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">torch</span>
+
+<span class="n">flipped_image</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">flip</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">,[</span><span class="mi">0</span><span class="p">])</span> <span class="c1"># as CHW, C is in dimension [0]
+</span></code></pre></div></div>
+      <h1 id="tensor-operations-using-torchvisiontransform">
+        
+        
+          <a href="#tensor-operations-using-torchvisiontransform" class="anchor-heading" aria-labelledby="tensor-operations-using-torchvisiontransform"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Tensor operations using torchvision.transform
+        
+        
+      </h1>
+    
+      <h2 id="padding">
+        
+        
+          <a href="#padding" class="anchor-heading" aria-labelledby="padding"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Padding
+        
+        
+      </h2>
+    
+
+<p>There are two ways of padding:</p>
+      <h3 id="padding-using-a-mask-tensor">
+        
+        
+          <a href="#padding-using-a-mask-tensor" class="anchor-heading" aria-labelledby="padding-using-a-mask-tensor"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Padding using a mask tensor
+        
+        
+      </h3>
+    
+
+<p>Lets say we have an image of size (CHW) = (3, 1200, 1300) <br />
+Now let’s assume we need to convert it into a square image</p>
+
+<p><em>Note. I’ve used padding on a rectangular image mostly in order to maintain aspect ratio during resize operations</em></p>
+      <h4 id="create-a-zero-mask">
+        
+        
+          <a href="#create-a-zero-mask" class="anchor-heading" aria-labelledby="create-a-zero-mask"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Create a zero mask
+        
+        
+      </h4>
+    
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">torch</span>
+
+<span class="n">pad_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">torch</span><span class="p">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1300</span><span class="p">,</span><span class="mi">1300</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="p">.</span><span class="n">int8</span><span class="p">))</span>
+</code></pre></div></div>
+      <h4 id="copy-the-original-image-onto-the-mask">
+        
+        
+          <a href="#copy-the-original-image-onto-the-mask" class="anchor-heading" aria-labelledby="copy-the-original-image-onto-the-mask"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Copy the original image onto the mask
+        
+        
+      </h4>
+    
+
+<p>Now the original image was of size:</p>
+<ul>
+  <li>orig image: (3,1200,1300)</li>
+  <li>pad_mask: (3,1300,1300)</li>
+</ul>
+
+<p>Therefore, we see that we need to only pad 50 pixels above and below in orig image</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">pad_mask</span><span class="p">[:,</span><span class="mi">50</span><span class="p">:</span><span class="mi">1250</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">orig_image</span>
+</code></pre></div></div>
+
+<p>pad_mask will be our final padded image now</p>
+      <h3 id="padding-using-a-torch-transform">
+        
+        
+          <a href="#padding-using-a-torch-transform" class="anchor-heading" aria-labelledby="padding-using-a-torch-transform"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Padding using a torch transform
+        
+        
+      </h3>
+    
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torchvision.transforms</span> <span class="k">as</span> <span class="n">T</span>
+
+<span class="c1"># we pass a tuple to the pad function below where (x,y)
+# x = pad amount in left and right
+# y = pad amount in top and bottom
+</span><span class="n">padder</span> <span class="o">=</span> <span class="n">T</span><span class="p">.</span><span class="n">Pad</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">50</span><span class="p">))</span>
+
+<span class="n">padded_img</span> <span class="o">=</span> <span class="n">padder</span><span class="p">(</span><span class="n">input_image</span><span class="p">)</span>
+</code></pre></div></div>
+      <h2 id="resizing">
+        
+        
+          <a href="#resizing" class="anchor-heading" aria-labelledby="resizing"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Resizing
+        
+        
+      </h2>
+    
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">torchvision.transforms</span> <span class="k">as</span> <span class="n">T</span>
+
+<span class="c1"># define the interpolation method
+# we're using NEAREST as default BILINEAR is not supported during ONNX conversion
+</span><span class="n">interpolation</span> <span class="o">=</span> <span class="n">T</span><span class="p">.</span><span class="n">InterpolationMode</span><span class="p">.</span><span class="n">NEAREST</span>
+
+<span class="n">resizer</span> <span class="o">=</span> <span class="n">T</span><span class="p">.</span><span class="n">Resize</span><span class="p">((</span><span class="mi">640</span><span class="p">,</span><span class="mi">640</span><span class="p">),</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">interpolation</span><span class="p">)</span>
+<span class="n">resized_image</span> <span class="o">=</span> <span class="n">resizer</span><span class="p">(</span><span class="n">input_image</span><span class="p">)</span>
+</code></pre></div></div>
+      <h1 id="torch-functionals">
+        
+        
+          <a href="#torch-functionals" class="anchor-heading" aria-labelledby="torch-functionals"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Torch Functionals
+        
+        
+      </h1>
+    
+
+<p>Many common tensor operations (used in DNNs) and few other meta operations are bundled in a class called <strong>Module</strong></p>
+
+<p>Let’s create a custom layer by subclassing the Module class (standard procedure)</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="n">nn</span>
+
+<span class="k">class</span> <span class="nc">Custom_Layer</span><span class="p">(</span><span class="n">nn</span><span class="p">.</span><span class="n">Module</span><span class="p">):</span>
+  
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">().</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">linear</span> <span class="o">=</span> <span class="n">nn</span><span class="p">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="nb">input</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">linear</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">x</span>
+</code></pre></div></div>
+
+<p>Here we saw that <strong>nn.Linear</strong> was used, but there are also other functions like <br />
+nn.Conv2D and nn.ReLu which are commonly used</p>
+
+<p>These functions like nn.ReLu are said to be of the form <strong>torch.nn.functional</strong></p>
+
+<p>i.e. Relu and Conv2D are all <strong>torch functionals</strong></p>
+      <h2 id="using-torchvisiontransformations-inside-functionals">
+        
+        
+          <a href="#using-torchvisiontransformations-inside-functionals" class="anchor-heading" aria-labelledby="using-torchvisiontransformations-inside-functionals"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Using torchvision.transformations inside functionals
+        
+        
+      </h2>
+    
+
+<p>Let’s club together resizing and padding and put them in a functional called <strong>Sequential</strong></p>
+
+<p>As the name suggests, Sequential executes anhy operations one after another</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">torchvision.transforms</span> <span class="k">as</span> <span class="n">T</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+
+<span class="n">interpolation</span> <span class="o">=</span> <span class="n">T</span><span class="p">.</span><span class="n">InterpolationMode</span><span class="p">.</span><span class="n">NEAREST</span>
+<span class="n">transformer</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">Sequential</span><span class="p">(</span><span class="n">T</span><span class="p">.</span><span class="n">Pad</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="n">pad_const</span><span class="p">)),</span><span class="n">T</span><span class="p">.</span><span class="n">Resize</span><span class="p">((</span><span class="mi">640</span><span class="p">,</span><span class="mi">640</span><span class="p">),</span><span class="n">interpolation</span><span class="o">=</span><span class="n">interpolation</span><span class="p">))</span>
+
+<span class="n">output_image</span> <span class="o">=</span> <span class="n">transformer</span><span class="p">(</span><span class="n">input_image</span><span class="p">)</span>
+</code></pre></div></div>
+      <h2 id="creating-meta-models">
+        
+        
+          <a href="#creating-meta-models" class="anchor-heading" aria-labelledby="creating-meta-models"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Creating Meta Models
+        
+        
+      </h2>
+    
+
+<p>Let’s say we have an existing model in pytorch called <em>pretrained_model</em> <br />
+and we want to add additional layers to it in the beginning or the end</p>
+
+<p>Usually a model has a few class variables as well like stride, no. of classes etc. We will have to retain this info in our meta model as well</p>
+
+<p>Now let’s define our custom model:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torchvision.transforms</span> <span class="k">as</span> <span class="n">T</span>
+
+<span class="k">class</span> <span class="nc">Custom_Layer</span><span class="p">(</span><span class="n">nn</span><span class="p">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="c1"># Custom layer for preprocessing
+</span>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">().</span><span class="n">__init__</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">input_tensor</span><span class="p">):</span>
+        <span class="n">input_tensor</span> <span class="o">=</span> <span class="n">input_tensor</span><span class="p">.</span><span class="nb">type</span><span class="p">(</span><span class="n">torch</span><span class="p">.</span><span class="n">cuda</span><span class="p">.</span><span class="n">FloatTensor</span><span class="p">)</span>
+        <span class="c1">#print("input tensor type: ", input_tensor.dtype)
+</span>        <span class="n">pad_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">torch</span><span class="p">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1328</span><span class="p">,</span> <span class="mi">1328</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="p">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        
+        <span class="n">flipped_image</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">flip</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">,[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">pad_mask</span><span class="p">[:,</span><span class="mi">64</span><span class="p">:</span><span class="mi">1264</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">flipped_image</span>
+    
+        <span class="n">interpolation</span> <span class="o">=</span> <span class="n">T</span><span class="p">.</span><span class="n">InterpolationMode</span><span class="p">.</span><span class="n">NEAREST</span>
+        <span class="c1">#transformer = torch.nn.Sequential(T.Pad((0,pad_const)),T.Resize((640,640),interpolation=interpolation))
+</span>        <span class="n">transformer</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">Sequential</span><span class="p">(</span><span class="n">T</span><span class="p">.</span><span class="n">Resize</span><span class="p">((</span><span class="mi">640</span><span class="p">,</span><span class="mi">640</span><span class="p">),</span><span class="n">interpolation</span><span class="o">=</span><span class="n">interpolation</span><span class="p">))</span>
+        <span class="n">transformed_tensor</span> <span class="o">=</span> <span class="n">transformer</span><span class="p">(</span><span class="n">pad_mask</span><span class="p">).</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">transformed_tensor</span>
+
+<span class="k">class</span> <span class="nc">Custom_Model</span><span class="p">(</span><span class="n">nn</span><span class="p">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pretrained_model</span><span class="p">,</span> <span class="n">nc</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">stride</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Custom_Model</span><span class="p">,</span> <span class="bp">self</span><span class="p">).</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">nc</span> <span class="o">=</span> <span class="n">nc</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">names</span> <span class="o">=</span> <span class="n">names</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">preproc_layers</span> <span class="o">=</span> <span class="n">Custom_Layer</span><span class="p">()</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">pretrained</span> <span class="o">=</span> <span class="n">pretrained_model</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">stride</span> <span class="o">=</span> <span class="n">stride</span>
+    
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="c1"># add with no grad condition for the next line?
+</span>        <span class="n">mod</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">preproc_layers</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+        <span class="n">mod</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">pretrained</span><span class="p">(</span><span class="n">mod</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">mod</span>
+</code></pre></div></div>
+
+<p>We have defined in the above code a custom layer and a custom model.</p>
+
+<p>You may have observed that we used torch.cuda.float16. This is because the existing tensors of the pretrained_model are all loaded onto GPU. To interface with them, we need to initialize our new tensors on the GPU as well.</p>
+
+<p>Now, let’s call this custom model in a seperate function:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">custom_load</span><span class="p">(</span><span class="n">weights_file_path</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+    <span class="n">existing_model</span><span class="p">,</span> <span class="n">stride</span> <span class="o">=</span> <span class="n">attempt_load</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="n">weights_file_path</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">fuse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">nc_existing</span><span class="p">,</span> <span class="n">names_existing</span> <span class="o">=</span> <span class="n">existing_model</span><span class="p">.</span><span class="n">nc</span><span class="p">,</span> <span class="n">existing_model</span><span class="p">.</span><span class="n">names</span>
+    <span class="n">extended_model</span> <span class="o">=</span> <span class="n">Custom_Model</span><span class="p">(</span><span class="n">pretrained_model</span><span class="o">=</span><span class="n">existing_model</span><span class="p">,</span> <span class="n">nc</span><span class="o">=</span><span class="n">nc_existing</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">names_existing</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="n">stride</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">extended_model</span>
+</code></pre></div></div>
 
         
 
