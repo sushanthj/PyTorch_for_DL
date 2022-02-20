@@ -1,0 +1,251 @@
+
+
+<!DOCTYPE html>
+
+<html lang="en-US">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+
+  
+
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+
+  <link rel="stylesheet" href="/assets/css/just-the-docs-default.css">
+
+  
+
+  
+    <script type="text/javascript" src="/assets/js/vendor/lunr.min.js"></script>
+  
+  <script type="text/javascript" src="/assets/js/just-the-docs.js"></script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Derivatives in PyTorch | Pytorch</title>
+<meta name="generator" content="Jekyll v4.2.0" />
+<meta property="og:title" content="Derivatives in PyTorch" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Pytorch for DL" />
+<meta property="og:description" content="Pytorch for DL" />
+<link rel="canonical" href="/Derivatives/" />
+<meta property="og:url" content="/Derivatives/" />
+<meta property="og:site_name" content="Pytorch" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Derivatives in PyTorch" />
+<script type="application/ld+json">
+{"@type":"WebPage","url":"/Derivatives/","headline":"Derivatives in PyTorch","description":"Pytorch for DL","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  
+
+</head>
+
+<body>
+  <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+    <symbol id="svg-link" viewBox="0 0 24 24">
+      <title>Link</title>
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-link">
+        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+      </svg>
+    </symbol>
+    <symbol id="svg-search" viewBox="0 0 24 24">
+      <title>Search</title>
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search">
+        <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+    </symbol>
+    <symbol id="svg-menu" viewBox="0 0 24 24">
+      <title>Menu</title>
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu">
+        <line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </symbol>
+    <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+      <title>Expand</title>
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </symbol>
+    <symbol id="svg-doc" viewBox="0 0 24 24">
+      <title>Document</title>
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file">
+        <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline>
+      </svg>
+    </symbol>
+  </svg>
+
+  <div class="side-bar">
+    <div class="site-header">
+      <a href="/" class="site-title lh-tight">
+  Pytorch
+
+</a>
+      <a href="#" id="menu-button" class="site-button">
+        <svg viewBox="0 0 24 24" class="icon"><use xlink:href="#svg-menu"></use></svg>
+      </a>
+    </div>
+    <nav role="navigation" aria-label="Main" id="site-nav" class="site-nav">
+      
+        <ul class="nav-list"><li class="nav-list-item"><a href="/" class="nav-list-link">Home</a></li><li class="nav-list-item"><a href="/intro/" class="nav-list-link">Intro</a></li><li class="nav-list-item"><a href="/Tensors/" class="nav-list-link">PyTorch Tensors</a></li><li class="nav-list-item active"><a href="/Derivatives/" class="nav-list-link active">Derivatives in PyTorch</a></li><li class="nav-list-item"><a href="/transforms_functionals/" class="nav-list-link">PyTorch Transforms and Functionals</a></li><li class="nav-list-item"><a href="/git_concepts" class="nav-list-link">Git Concepts</a></li></ul>
+
+      
+    </nav>
+    <footer class="site-footer">
+      This site uses <a href="https://github.com/pmarsceill/just-the-docs">Just the Docs</a>, a documentation theme for Jekyll.
+    </footer>
+  </div>
+  <div class="main" id="top">
+    <div id="main-header" class="main-header">
+      
+        <div class="search">
+          <div class="search-input-wrap">
+            <input type="text" id="search-input" class="search-input" tabindex="0" placeholder="Search Pytorch" aria-label="Search Pytorch" autocomplete="off">
+            <label for="search-input" class="search-label"><svg viewBox="0 0 24 24" class="search-icon"><use xlink:href="#svg-search"></use></svg></label>
+          </div>
+          <div id="search-results" class="search-results"></div>
+        </div>
+      
+      
+      
+        <nav aria-label="Auxiliary" class="aux-nav">
+          <ul class="aux-nav-list">
+            
+              <li class="aux-nav-list-item">
+                <a href="//github.com/sushanthj" class="site-button"
+                  
+                >
+                  Sushanth's GitHub
+                </a>
+              </li>
+            
+          </ul>
+        </nav>
+      
+    </div>
+    <div id="main-content-wrap" class="main-content-wrap">
+      
+        
+      
+      <div id="main-content" class="main-content" role="main">
+        
+          <details open="">
+  <summary class="text-delta">
+    Table of contents
+  </summary>
+<ol id="markdown-toc">
+  <li><a href="#derviates" id="markdown-toc-derviates">Derviates</a></li>
+  <li><a href="#partial-derivaties" id="markdown-toc-partial-derivaties">Partial Derivaties</a></li>
+  <li><a href="#differentiation-in-forwardbackward-pass-of-a-neural-net" id="markdown-toc-differentiation-in-forwardbackward-pass-of-a-neural-net">Differentiation in Forward/Backward pass of a Neural Net</a></li>
+</ol>
+
+</details>
+      <h1 id="derviates">
+        
+        
+          <a href="#derviates" class="anchor-heading" aria-labelledby="derviates"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Derviates
+        
+        
+      </h1>
+    
+
+<p><img src="/images/derivates.jpeg" alt="" /></p>
+      <h1 id="partial-derivaties">
+        
+        
+          <a href="#partial-derivaties" class="anchor-heading" aria-labelledby="partial-derivaties"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Partial Derivaties
+        
+        
+      </h1>
+    
+
+<p><img src="/images/partial_derivatives.jpeg" alt="" /></p>
+      <h1 id="differentiation-in-forwardbackward-pass-of-a-neural-net">
+        
+        
+          <a href="#differentiation-in-forwardbackward-pass-of-a-neural-net" class="anchor-heading" aria-labelledby="differentiation-in-forwardbackward-pass-of-a-neural-net"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Differentiation in Forward/Backward pass of a Neural Net
+        
+        
+      </h1>
+    
+
+<p>Previously we used ‘y.backward’ when doing the differentiation</p>
+
+<p>Now, let’s customize the ‘backward’ function according the math operator</p>
+
+<p>Let’s say: <strong>y = 2x</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">SQ</span><span class="p">(</span><span class="n">torch</span><span class="p">.</span><span class="n">autograd</span><span class="p">.</span><span class="n">Function</span><span class="p">):</span>
+
+
+    <span class="o">@</span><span class="nb">staticmethod</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span><span class="n">i</span><span class="p">):</span>
+        <span class="s">"""
+        In the forward pass we receive a Tensor containing the input and return
+        a Tensor containing the output. ctx is a context object that can be used
+        to stash information for backward computation. You can cache arbitrary
+        objects for use in the backward pass using the ctx.save_for_backward method.
+        """</span>
+        <span class="n">result</span><span class="o">=</span><span class="n">i</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">ctx</span><span class="p">.</span><span class="n">save_for_backward</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="o">@</span><span class="nb">staticmethod</span>
+    <span class="k">def</span> <span class="nf">backward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">grad_output</span><span class="p">):</span>
+        <span class="s">"""
+        In the backward pass we receive a Tensor containing the gradient of the loss
+        with respect to the output, and we need to compute the gradient of the loss
+        with respect to the input.
+        """</span>
+        <span class="n">i</span><span class="p">,</span> <span class="o">=</span> <span class="n">ctx</span><span class="p">.</span><span class="n">saved_tensors</span>
+        <span class="n">grad_output</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">i</span>
+        <span class="k">return</span> <span class="n">grad_output</span>
+</code></pre></div></div>
+
+<p>We will now apply the class above using a .apply tag as shown below:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">x</span><span class="o">=</span><span class="n">torch</span><span class="p">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span><span class="n">requires_grad</span><span class="o">=</span><span class="bp">True</span> <span class="p">)</span>
+<span class="n">sq</span><span class="o">=</span><span class="n">SQ</span><span class="p">.</span><span class="nb">apply</span>
+
+<span class="n">y</span><span class="o">=</span><span class="n">sq</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">y</span>
+<span class="k">print</span><span class="p">(</span><span class="n">y</span><span class="p">.</span><span class="n">grad_fn</span><span class="p">)</span>
+<span class="n">y</span><span class="p">.</span><span class="n">backward</span><span class="p">()</span>
+<span class="n">x</span><span class="p">.</span><span class="n">grad</span>
+</code></pre></div></div>
+
+        
+
+        
+
+        
+        
+          <hr>
+          <footer>
+            
+
+            <p class="text-small text-grey-dk-100 mb-0"></p>
+
+            
+              <div class="d-flex mt-2">
+                
+                
+              </div>
+            
+          </footer>
+        
+
+      </div>
+    </div>
+
+    
+      
+
+      <div class="search-overlay"></div>
+    
+  </div>
+</body>
+</html>
+
