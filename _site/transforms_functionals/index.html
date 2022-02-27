@@ -89,7 +89,7 @@
     </div>
     <nav role="navigation" aria-label="Main" id="site-nav" class="site-nav">
       
-        <ul class="nav-list"><li class="nav-list-item"><a href="/" class="nav-list-link">Home</a></li><li class="nav-list-item"><a href="/intro/" class="nav-list-link">Intro</a></li><li class="nav-list-item"><a href="/Tensors/" class="nav-list-link">PyTorch Tensors</a></li><li class="nav-list-item"><a href="/Derivatives/" class="nav-list-link">Derivatives in PyTorch</a></li><li class="nav-list-item active"><a href="/transforms_functionals/" class="nav-list-link active">PyTorch Transforms and Functionals</a></li><li class="nav-list-item"><a href="/git_concepts" class="nav-list-link">Git Concepts</a></li></ul>
+        <ul class="nav-list"><li class="nav-list-item"><a href="/" class="nav-list-link">Home</a></li><li class="nav-list-item"><a href="/Basics/" class="nav-list-link">Basics</a></li><li class="nav-list-item"><a href="/intro/" class="nav-list-link">Intro</a></li><li class="nav-list-item"><a href="/Tensors/" class="nav-list-link">PyTorch Tensors</a></li><li class="nav-list-item"><a href="/Derivatives/" class="nav-list-link">Derivatives in PyTorch</a></li><li class="nav-list-item active"><a href="/transforms_functionals/" class="nav-list-link active">PyTorch Transforms and Functionals</a></li><li class="nav-list-item"><a href="/Datasets/" class="nav-list-link">Datasets</a></li><li class="nav-list-item"><a href="/git_concepts" class="nav-list-link">Git Concepts</a></li></ul>
 
       
     </nav>
@@ -151,6 +151,7 @@
         </ol>
       </li>
       <li><a href="#resizing" id="markdown-toc-resizing">Resizing</a></li>
+      <li><a href="#multiple-transforms-at-once-composing" id="markdown-toc-multiple-transforms-at-once-composing">Multiple transforms at once (Composing):</a></li>
     </ol>
   </li>
   <li><a href="#torch-functionals" id="markdown-toc-torch-functionals">Torch Functionals</a>    <ol>
@@ -208,6 +209,8 @@ To correct this we usually do cv2.cvt_Color(image, cv2.BGR2RGB)</p>
         
       </h1>
     
+
+<p><em>Note: To understand better about image loading, lookup the ‘Dataset Examples/image_dataset_from_scratch’</em></p>
       <h2 id="padding">
         
         
@@ -301,6 +304,20 @@ Now let’s assume we need to convert it into a square image</p>
 
 <span class="n">resizer</span> <span class="o">=</span> <span class="n">T</span><span class="p">.</span><span class="n">Resize</span><span class="p">((</span><span class="mi">640</span><span class="p">,</span><span class="mi">640</span><span class="p">),</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">interpolation</span><span class="p">)</span>
 <span class="n">resized_image</span> <span class="o">=</span> <span class="n">resizer</span><span class="p">(</span><span class="n">input_image</span><span class="p">)</span>
+</code></pre></div></div>
+      <h2 id="multiple-transforms-at-once-composing">
+        
+        
+          <a href="#multiple-transforms-at-once-composing" class="anchor-heading" aria-labelledby="multiple-transforms-at-once-composing"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Multiple transforms at once (Composing):
+        
+        
+      </h2>
+    
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">transforms</span>
+
+<span class="n">data_transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="p">.</span><span class="n">Compose</span><span class="p">([</span><span class="n">transformer_1</span><span class="p">(),</span> <span class="n">transformer_2</span><span class="p">()])</span>
+<span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">data_transform</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">)</span>
 </code></pre></div></div>
       <h1 id="torch-functionals">
         

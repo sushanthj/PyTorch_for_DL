@@ -44,6 +44,8 @@ flipped_image = torch.flip(input_tensor,[0]) # as CHW, C is in dimension [0]
 
 # Tensor operations using torchvision.transform
 
+*Note: To understand better about image loading, lookup the 'Dataset Examples/image_dataset_from_scratch'*
+
 ## Padding
 
 There are two ways of padding:
@@ -102,6 +104,15 @@ interpolation = T.InterpolationMode.NEAREST
 
 resizer = T.Resize((640,640), interpolation=interpolation)
 resized_image = resizer(input_image)
+```
+
+## Multiple transforms at once (Composing):
+
+```python
+from torchvision import transforms
+
+data_transform = transforms.Compose([transformer_1(), transformer_2()])
+x, y = data_transform(x1, y1)
 ```
 
 # Torch Functionals

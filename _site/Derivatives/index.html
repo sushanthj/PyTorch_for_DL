@@ -89,7 +89,7 @@
     </div>
     <nav role="navigation" aria-label="Main" id="site-nav" class="site-nav">
       
-        <ul class="nav-list"><li class="nav-list-item"><a href="/" class="nav-list-link">Home</a></li><li class="nav-list-item"><a href="/intro/" class="nav-list-link">Intro</a></li><li class="nav-list-item"><a href="/Tensors/" class="nav-list-link">PyTorch Tensors</a></li><li class="nav-list-item active"><a href="/Derivatives/" class="nav-list-link active">Derivatives in PyTorch</a></li><li class="nav-list-item"><a href="/transforms_functionals/" class="nav-list-link">PyTorch Transforms and Functionals</a></li><li class="nav-list-item"><a href="/git_concepts" class="nav-list-link">Git Concepts</a></li></ul>
+        <ul class="nav-list"><li class="nav-list-item"><a href="/" class="nav-list-link">Home</a></li><li class="nav-list-item"><a href="/Basics/" class="nav-list-link">Basics</a></li><li class="nav-list-item"><a href="/intro/" class="nav-list-link">Intro</a></li><li class="nav-list-item"><a href="/Tensors/" class="nav-list-link">PyTorch Tensors</a></li><li class="nav-list-item active"><a href="/Derivatives/" class="nav-list-link active">Derivatives in PyTorch</a></li><li class="nav-list-item"><a href="/transforms_functionals/" class="nav-list-link">PyTorch Transforms and Functionals</a></li><li class="nav-list-item"><a href="/Datasets/" class="nav-list-link">Datasets</a></li><li class="nav-list-item"><a href="/git_concepts" class="nav-list-link">Git Concepts</a></li></ul>
 
       
     </nav>
@@ -136,9 +136,17 @@
     Table of contents
   </summary>
 <ol id="markdown-toc">
-  <li><a href="#derviates" id="markdown-toc-derviates">Derviates</a></li>
+  <li><a href="#derviates" id="markdown-toc-derviates">Derviates</a>    <ol>
+      <li><a href="#understanding-the-variables-in-derivatives" id="markdown-toc-understanding-the-variables-in-derivatives">Understanding the variables in derivatives</a></li>
+      <li><a href="#passing-multiple-values-as-input-to-a-function-whose-gradient-we-find" id="markdown-toc-passing-multiple-values-as-input-to-a-function-whose-gradient-we-find">Passing multiple values as input to a function whose gradient we find</a></li>
+      <li><a href="#plotting-the-above-function-in-matplotlib" id="markdown-toc-plotting-the-above-function-in-matplotlib">Plotting the above function in matplotlib</a></li>
+    </ol>
+  </li>
   <li><a href="#partial-derivaties" id="markdown-toc-partial-derivaties">Partial Derivaties</a></li>
-  <li><a href="#differentiation-in-forwardbackward-pass-of-a-neural-net" id="markdown-toc-differentiation-in-forwardbackward-pass-of-a-neural-net">Differentiation in Forward/Backward pass of a Neural Net</a></li>
+  <li><a href="#differentiation-in-forwardbackward-pass-of-a-neural-net" id="markdown-toc-differentiation-in-forwardbackward-pass-of-a-neural-net">Differentiation in Forward/Backward pass of a Neural Net</a>    <ol>
+      <li><a href="#torchis_leaf" id="markdown-toc-torchis_leaf">Torch.is_leaf</a></li>
+    </ol>
+  </li>
 </ol>
 
 </details>
@@ -152,6 +160,83 @@
     
 
 <p><img src="/images/derivates.jpeg" alt="" /></p>
+      <h2 id="understanding-the-variables-in-derivatives">
+        
+        
+          <a href="#understanding-the-variables-in-derivatives" class="anchor-heading" aria-labelledby="understanding-the-variables-in-derivatives"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Understanding the variables in derivatives
+        
+        
+      </h2>
+    
+
+<p>If we have a simple y=x**2 function, the way each tensor gets defined changes.</p>
+
+<p>Notice how we define the tensor x:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Create a tensor x
+</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">requires_grad</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"The tensor x: "</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Now notice how we define y:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Create a tensor y according to y = x^2
+</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">x</span> <span class="o">**</span> <span class="mi">2</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"The result of y = x^2: "</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Now that the tensors are defined, there are two steps we need to follow to get the derivative at a specific point:</p>
+<ol>
+  <li>y.backward()</li>
+  <li>x.grad</li>
+</ol>
+
+<p>On their own, each would not be sufficient to find grad. However, y.backward() does the actual math part of derivation in the background and the <em>gradient is stored in the x tensor</em></p>
+
+<p>Notice the following attributes of x and y and their respective outputs:</p>
+
+<p><img src="/images/derivates.jpeg" alt="" /></p>
+      <h2 id="passing-multiple-values-as-input-to-a-function-whose-gradient-we-find">
+        
+        
+          <a href="#passing-multiple-values-as-input-to-a-function-whose-gradient-we-find" class="anchor-heading" aria-labelledby="passing-multiple-values-as-input-to-a-function-whose-gradient-we-find"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Passing multiple values as input to a function whose gradient we find
+        
+        
+      </h2>
+    
+
+<p>Here we use the similar linspace function (like numpy) to get a range of values:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Calculate the derivative with multiple values
+</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">requires_grad</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">x</span> <span class="o">**</span> <span class="mi">2</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+</code></pre></div></div>
+      <h2 id="plotting-the-above-function-in-matplotlib">
+        
+        
+          <a href="#plotting-the-above-function-in-matplotlib" class="anchor-heading" aria-labelledby="plotting-the-above-function-in-matplotlib"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Plotting the above function in matplotlib
+        
+        
+      </h2>
+    
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Take the derivative with respect to multiple value. Plot out the function and its derivative
+</span>
+<span class="n">y</span><span class="p">.</span><span class="n">backward</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">.</span><span class="n">detach</span><span class="p">().</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">Y</span><span class="p">.</span><span class="n">detach</span><span class="p">().</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">label</span> <span class="o">=</span> <span class="s">'function'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">.</span><span class="n">detach</span><span class="p">().</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">x</span><span class="p">.</span><span class="n">grad</span><span class="p">.</span><span class="n">detach</span><span class="p">().</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">label</span> <span class="o">=</span> <span class="s">'derivative'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'x'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>In the example, we use x.detach and y.detach <br />
+What this does is ensure that further grads or any values are not added as attributes to x and y tensors</p>
+
+<p>Note: The tensors use graphs to populate values of x.grad and y.grad. Hence, these detach functions <br />
+essentially just disable any further sub-graphs being populated to x or y</p>
       <h1 id="partial-derivaties">
         
         
@@ -215,6 +300,16 @@
 <span class="n">y</span><span class="p">.</span><span class="n">backward</span><span class="p">()</span>
 <span class="n">x</span><span class="p">.</span><span class="n">grad</span>
 </code></pre></div></div>
+      <h2 id="torchis_leaf">
+        
+        
+          <a href="#torchis_leaf" class="anchor-heading" aria-labelledby="torchis_leaf"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Torch.is_leaf
+        
+        
+      </h2>
+    
+
+<p><img src="/images/is_leaf.jpeg" alt="" /></p>
 
         
 

@@ -18,6 +18,67 @@ nav_order: 4
 
 ![](/images/derivates.jpeg)
 
+## Understanding the variables in derivatives
+
+If we have a simple y=x**2 function, the way each tensor gets defined changes.
+
+Notice how we define the tensor x:
+```python
+# Create a tensor x
+
+x = torch.tensor(2.0, requires_grad = True)
+print("The tensor x: ", x)
+```
+
+Now notice how we define y:
+```python
+# Create a tensor y according to y = x^2
+
+y = x ** 2
+print("The result of y = x^2: ", y)
+```
+
+Now that the tensors are defined, there are two steps we need to follow to get the derivative at a specific point:
+1. y.backward()
+2. x.grad
+
+On their own, each would not be sufficient to find grad. However, y.backward() does the actual math part of derivation in the background and the *gradient is stored in the x tensor*
+
+Notice the following attributes of x and y and their respective outputs:
+
+![](/images/derivates.jpeg)
+
+## Passing multiple values as input to a function whose gradient we find
+
+Here we use the similar linspace function (like numpy) to get a range of values:
+```python
+# Calculate the derivative with multiple values
+
+x = torch.linspace(-10, 10, 10, requires_grad = True)
+Y = x ** 2
+y = torch.sum(x ** 2)
+```
+
+## Plotting the above function in matplotlib
+
+```python
+# Take the derivative with respect to multiple value. Plot out the function and its derivative
+
+y.backward()
+
+plt.plot(x.detach().numpy(), Y.detach().numpy(), label = 'function')
+plt.plot(x.detach().numpy(), x.grad.detach().numpy(), label = 'derivative')
+plt.xlabel('x')
+plt.legend()
+plt.show()
+```
+
+In the example, we use x.detach and y.detach \
+What this does is ensure that further grads or any values are not added as attributes to x and y tensors
+
+Note: The tensors use graphs to populate values of x.grad and y.grad. Hence, these detach functions \
+essentially just disable any further sub-graphs being populated to x or y
+
 # Partial Derivaties
 
 ![](/images/partial_derivatives.jpeg)
@@ -70,3 +131,7 @@ print(y.grad_fn)
 y.backward()
 x.grad
 ```
+
+## Torch.is_leaf
+
+![](/images/is_leaf.jpeg)
