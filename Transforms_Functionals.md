@@ -219,3 +219,5 @@ def custom_load(weights_file_path, device):
     extended_model = Custom_Model(pretrained_model=existing_model, nc=nc_existing, names=names_existing, stride=stride)
     return extended_model
 ```
+
+**Note in any model which is constructed using the nn.Module class, you do not need to specify the forward function, you just need to call the custom model class as: *output = Custom_Model(input)***
