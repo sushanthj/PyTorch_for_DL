@@ -1,7 +1,7 @@
 ---
 layout: page
-title: Datasets
-permalink: /Datasets/
+title: Datasets & Dataloaders
+permalink: /Datasets+Dataloaders/
 nav_order: 6
 ---
 
@@ -131,3 +131,81 @@ Creating a object of dataset class:
 ```python
 dataset = Dataset(csv_file=csv_file, data_dir=directory)
 ```
+
+# Dataloader
+
+Both Dataset and Dataloader are inbuilt classes in pytorch
+
+We use both in conjunction in cases such as in Stochastic Gradient Descent where each \
+datapoint from the dataset is executed one by one (instead of a bunch of datapoints \
+such as in batch gradiet descent)
+
+See the example of SGD below where we define a **dataset and dataloader**:
+
+```python
+from torch.utils.data import Dataset, DataLoader
+
+# Dataset Class
+class Data(Dataset):
+    
+    # Constructor
+    def __init__(self):
+        self.x = torch.arange(-3, 3, 0.1).view(-1, 1)
+        self.y = 1 * self.x - 1
+        self.len = self.x.shape[0]
+        
+    # Getter
+    def __getitem__(self,index):    
+        return self.x[index], self.y[index]
+    
+    # Return the length
+    def __len__(self):
+        return self.len
+
+
+# Create the dataset and check the length
+dataset = Data()
+print("The length of dataset: ", len(dataset))
+
+# Create DataLoader
+trainloader = DataLoader(dataset = dataset, batch_size = 1)
+
+
+# Training the model
+w = torch.tensor(-15.0,requires_grad=True)
+b = torch.tensor(-10.0,requires_grad=True)
+LOSS_Loader = []
+
+def train_model_DataLoader(epochs):
+    
+    # Loop
+    for epoch in range(epochs):
+        
+        # SGD is an approximation of out true total loss/cost, in this line of code we calculate our true loss/cost and store it
+        Yhat = forward(X)
+        
+        # store the loss 
+        LOSS_Loader.append(criterion(Yhat, Y).tolist())
+        
+        for x, y in trainloader:
+            
+            # make a prediction
+            yhat = forward(x)
+            
+            # calculate the loss
+            loss = criterion(yhat, y)
+            
+            # Backward pass: compute gradient of the loss with respect to all the learnable parameters
+            loss.backward()
+            
+            # Updata parameters slope
+            w.data = w.data - lr * w.grad.data
+            b.data = b.data - lr* b.grad.data
+            
+            # Clear gradients 
+            w.grad.data.zero_()
+            b.grad.data.zero_()
+
+train_model_DataLoader(10)
+```
+
