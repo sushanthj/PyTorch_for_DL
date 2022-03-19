@@ -209,3 +209,19 @@ def train_model_DataLoader(epochs):
 train_model_DataLoader(10)
 ```
 
+# Mini Batches
+
+Consider the below example:
+![](/images/batch_size.jpeg)
+
+The logic is that one epoch means one complete sweep of the datapoints present in the dataset
+
+Therefore, if a dataset has only 100 images and our mini batch size is 50, then we will need 2 iterations of the train loop to finish 1 epoch.
+
+No. of iterations per epoch = (Dataset size / batch size)
+
+## Side Note:
+
+A datapoint is an interesting term in Data science. It may not mean one complete object in a dataset.
+
+Say we have an image with two plants in them. Then one datapoint refers not to one image, but to on box in the image (which contains the plant).
