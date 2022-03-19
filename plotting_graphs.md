@@ -131,5 +131,3 @@ get_surface = plot_error_surfaces(15, 13, X, Y, 30)
 get_surface.set_para_loss(w.data.tolist(), b.data.tolist(), loss.tolist())
 get_surface.plot_ps()
 ```
-
-# Trial commit
