@@ -212,3 +212,54 @@ In official terms, the loss is the difference (yhat-y)**2, which we call the los
 Also, the cost is the mean of the all loss over all variables (say if x and y were a 1D vector of size 10)
 
 However, in pytorch the cost is called 'loss' directly
+
+# Easier way of Model Training (using in-built functions)
+
+Note. Every model's learable parameters (like weights and biases) are available as **model.state_dict()**
+
+```python
+# Create a linear regression model class
+
+from torch import nn, optim
+
+class linear_regression(nn.Module):
+    
+    # Constructor
+    def __init__(self, input_size, output_size):
+        super(linear_regression, self).__init__()
+        self.linear = nn.Linear(input_size, output_size)
+        
+    # Prediction
+    def forward(self, x):
+        yhat = self.linear(x)
+        return yhat
+
+# Built-in cost function
+criterion = nn.MSELoss()
+
+model = linear_regression(1,1)
+# built in optimizer to keep track of learnable params
+optimizer = optim.SGD(model.parameters(), lr = 0.01)
+
+trainloader = DataLoader(dataset = dataset, batch_size = 1)
+
+# Customize the weight and bias
+
+model.state_dict()['linear.weight'][0] = -15
+model.state_dict()['linear.bias'][0] = -10
+
+def train_model_BGD(iter):
+    for epoch in range(iter):
+        for x,y in trainloader:
+            yhat = model(x)
+            loss = criterion(yhat, y)
+            get_surface.set_para_loss(model, loss.tolist())          
+            optimizer.zero_grad()
+            loss.backward()
+
+            optimizer.step()
+        get_surface.plot_ps()
+
+# train the model
+train_model_BGD(10)
+```
