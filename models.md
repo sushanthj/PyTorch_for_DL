@@ -1,7 +1,7 @@
 ---
 layout: page
-title: PyTorch Models
-permalink: /torch.nn/
+title: Types fo pytorch models
+permalink: /torch models/
 nav_order: 8
 ---
 
@@ -288,4 +288,20 @@ Here the function of z is different (it's a sigmoid curve)
 
 **Note. z can also be a probability function (whose curve will look different)**
 
+## Torch methods to implement sigmoid functions
 
+### Method 1
+
+![](/images/sigmoid_1.jpeg)
+
+### Method 2
+
+![](/images/sigmoid_2.jpeg)
+
+## Method 3
+
+```python
+model = nn.Sequential(nn.Linear(1,1), nn.Sigmoid())
+
+yhat = model(x)
+```
