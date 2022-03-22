@@ -263,3 +263,29 @@ def train_model_BGD(iter):
 # train the model
 train_model_BGD(10)
 ```
+
+# Prediction after Linear or Logistic Regression
+
+- The regression part (to get an idea) is to find the best fit between input and output features ( say x and y in the equation y = wx +b as in the case of linear regression)
+
+- Now after we *tune* our model to give the best fit, we then need to use the model output in some way
+
+- One common aspect of a model is to use it as a classifier. i.e. figure out if our output fits to class A or class B.
+
+- This can be done by passing the value y (in y = wx +b) to a function like logistic function or a thresholding function which classifies it into class A or class B (which will be our final prediction)
+
+Just an intro to linear and logistic regression predictions:
+
+![](/images/linear_classifier.jpeg)
+
+Here the thresholding function is just z = 1 ( if y > 1) or z = 0 (if y < 1)
+
+In the above example at x = 3 -> y = 2, therefore the predicted class is z = 1
+
+![](/images/logistic_regression.jpeg)
+![](/images/logistic_regression_2.jpeg)
+Here the function of z is different (it's a sigmoid curve)
+
+**Note. z can also be a probability function (whose curve will look different)**
+
+
