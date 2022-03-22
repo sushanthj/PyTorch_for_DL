@@ -225,3 +225,55 @@ No. of iterations per epoch = (Dataset size / batch size)
 A datapoint is an interesting term in Data science. It may not mean one complete object in a dataset.
 
 Say we have an image with two plants in them. Then one datapoint refers not to one image, but to on box in the image (which contains the plant).
+
+
+## Summary
+
+The process for using datasets and dataloaders in a model is:
+
+- Create a dataset class where you initialize tensors randomly or load images from a file
+- Use the above dataset class to create a **Dataset object**
+- Use the existing torch.Dataloader class and create a data_loader object (giving dataset object as arg)
+- Use dataloader inside model
+
+```python
+## Dataset Class ##
+class Data2D(Dataset):
+    
+    # Constructor
+    def __init__(self):
+        self.x = torch.zeros(20, 2)
+        self.x[:, 0] = torch.arange(-1, 1, 0.1)
+        self.x[:, 1] = torch.arange(-1, 1, 0.1)
+        self.w = torch.tensor([[1.0], [1.0]])
+        self.b = 1
+        self.f = torch.mm(self.x, self.w) + self.b    
+        self.y = self.f + 0.1 * torch.randn((self.x.shape[0],1))
+        self.len = self.x.shape[0]
+
+    # Getter
+    def __getitem__(self, index):          
+        return self.x[index], self.y[index]
+    
+    # Get Length
+    def __len__(self):
+        return self.len
+
+## Create the dataset object ##
+data_set = Data2D()
+
+## Create the data loader ##
+train_loader = DataLoader(dataset=data_set, batch_size=2)
+
+## Model training ##
+def train_model(epochs):    
+    for epoch in range(epochs):
+        for x,y in train_loader:
+            yhat = model(x)
+            loss = criterion(yhat, y)
+            LOSS.append(loss.item())
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()     
+train_model(epochs)
+```
